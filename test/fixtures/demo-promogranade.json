@@ -1,0 +1,816 @@
+{
+ "keywords": [
+  {
+   "keyword": "ai agent development company",
+   "volume": 880,
+   "cpc": 18.5,
+   "competition": 0.4,
+   "providerKd": 34,
+   "intent": "transactional",
+   "trend": [
+    880,
+    880,
+    880,
+    880,
+    880,
+    880,
+    880,
+    880,
+    880,
+    880,
+    880,
+    880
+   ]
+  },
+  {
+   "keyword": "nextjs development agency",
+   "volume": 590,
+   "cpc": 22.0,
+   "competition": 0.4,
+   "providerKd": 41,
+   "intent": "transactional",
+   "trend": [
+    590,
+    590,
+    590,
+    590,
+    590,
+    590,
+    590,
+    590,
+    590,
+    590,
+    590,
+    590
+   ]
+  },
+  {
+   "keyword": "next.js vs wordpress",
+   "volume": 1300,
+   "cpc": 3.1,
+   "competition": 0.4,
+   "providerKd": 22,
+   "intent": "commercial",
+   "trend": [
+    1300,
+    1300,
+    1300,
+    1300,
+    1300,
+    1300,
+    1300,
+    1300,
+    1300,
+    1300,
+    1300,
+    1300
+   ]
+  },
+  {
+   "keyword": "generative engine optimization",
+   "volume": 2400,
+   "cpc": 9.8,
+   "competition": 0.4,
+   "providerKd": 38,
+   "intent": "informational",
+   "trend": [
+    2400,
+    2400,
+    2400,
+    2400,
+    2400,
+    2400,
+    2400,
+    2400,
+    2400,
+    2400,
+    2400,
+    2400
+   ]
+  },
+  {
+   "keyword": "what is answer engine optimization",
+   "volume": 1600,
+   "cpc": 6.2,
+   "competition": 0.4,
+   "providerKd": 27,
+   "intent": "informational",
+   "trend": [
+    1600,
+    1600,
+    1600,
+    1600,
+    1600,
+    1600,
+    1600,
+    1600,
+    1600,
+    1600,
+    1600,
+    1600
+   ]
+  },
+  {
+   "keyword": "workflow automation agency",
+   "volume": 480,
+   "cpc": 15.0,
+   "competition": 0.4,
+   "providerKd": 29,
+   "intent": "transactional",
+   "trend": [
+    480,
+    480,
+    480,
+    480,
+    480,
+    480,
+    480,
+    480,
+    480,
+    480,
+    480,
+    480
+   ]
+  },
+  {
+   "keyword": "n8n automation services",
+   "volume": 260,
+   "cpc": 12.0,
+   "competition": 0.4,
+   "providerKd": 18,
+   "intent": "transactional",
+   "trend": [
+    260,
+    260,
+    260,
+    260,
+    260,
+    260,
+    260,
+    260,
+    260,
+    260,
+    260,
+    260
+   ]
+  },
+  {
+   "keyword": "custom ai systems for business",
+   "volume": 210,
+   "cpc": 14.0,
+   "competition": 0.4,
+   "providerKd": 33,
+   "intent": "commercial",
+   "trend": [
+    210,
+    210,
+    210,
+    210,
+    210,
+    210,
+    210,
+    210,
+    210,
+    210,
+    210,
+    210
+   ]
+  },
+  {
+   "keyword": "rag pipeline for business",
+   "volume": 320,
+   "cpc": 8.5,
+   "competition": 0.4,
+   "providerKd": 25,
+   "intent": "informational",
+   "trend": [
+    320,
+    320,
+    320,
+    320,
+    320,
+    320,
+    320,
+    320,
+    320,
+    320,
+    320,
+    320
+   ]
+  },
+  {
+   "keyword": "how much does a custom web app cost",
+   "volume": 720,
+   "cpc": 11.0,
+   "competition": 0.4,
+   "providerKd": 31,
+   "intent": "commercial",
+   "trend": [
+    720,
+    720,
+    720,
+    720,
+    720,
+    720,
+    720,
+    720,
+    720,
+    720,
+    720,
+    720
+   ]
+  },
+  {
+   "keyword": "meta ads vs google ads",
+   "volume": 2900,
+   "cpc": 4.5,
+   "competition": 0.4,
+   "providerKd": 46,
+   "intent": "commercial",
+   "trend": [
+    2900,
+    2900,
+    2900,
+    2900,
+    2900,
+    2900,
+    2900,
+    2900,
+    2900,
+    2900,
+    2900,
+    2900
+   ]
+  },
+  {
+   "keyword": "seo agency",
+   "volume": 40500,
+   "cpc": 35.0,
+   "competition": 0.4,
+   "providerKd": 78,
+   "intent": "transactional",
+   "trend": [
+    40500,
+    40500,
+    40500,
+    40500,
+    40500,
+    40500,
+    40500,
+    40500,
+    40500,
+    40500,
+    40500,
+    40500
+   ]
+  },
+  {
+   "keyword": "pizza near me",
+   "volume": 90500,
+   "cpc": 1.2,
+   "competition": 0.4,
+   "providerKd": 15,
+   "intent": "transactional",
+   "trend": [
+    90500,
+    90500,
+    90500,
+    90500,
+    90500,
+    90500,
+    90500,
+    90500,
+    90500,
+    90500,
+    90500,
+    90500
+   ]
+  }
+ ],
+ "serps": {
+  "next.js vs wordpress": {
+   "keyword": "next.js vs wordpress",
+   "organic": [
+    {
+     "position": 1,
+     "url": "https://site1.example/next.js-vs-wordpress",
+     "domain": "site1.example",
+     "title": "Next.Js Vs Wordpress",
+     "referringDomains": 40
+    },
+    {
+     "position": 2,
+     "url": "https://site2.example/next.js-vs-wordpress",
+     "domain": "site2.example",
+     "title": "Next.Js Vs Wordpress",
+     "referringDomains": 22
+    },
+    {
+     "position": 3,
+     "url": "https://site3.example/next.js-vs-wordpress",
+     "domain": "site3.example",
+     "title": "Next.Js Vs Wordpress",
+     "referringDomains": 18
+    },
+    {
+     "position": 4,
+     "url": "https://site4.example/next.js-vs-wordpress",
+     "domain": "site4.example",
+     "title": "Next.Js Vs Wordpress",
+     "referringDomains": 30
+    },
+    {
+     "position": 5,
+     "url": "https://site5.example/next.js-vs-wordpress",
+     "domain": "site5.example",
+     "title": "Next.Js Vs Wordpress",
+     "referringDomains": 12
+    },
+    {
+     "position": 6,
+     "url": "https://site6.example/next.js-vs-wordpress",
+     "domain": "site6.example",
+     "title": "Next.Js Vs Wordpress",
+     "referringDomains": 9
+    },
+    {
+     "position": 7,
+     "url": "https://site7.example/next.js-vs-wordpress",
+     "domain": "site7.example",
+     "title": "Next.Js Vs Wordpress",
+     "referringDomains": 15
+    },
+    {
+     "position": 8,
+     "url": "https://site8.example/next.js-vs-wordpress",
+     "domain": "site8.example",
+     "title": "Next.Js Vs Wordpress",
+     "referringDomains": 7
+    },
+    {
+     "position": 9,
+     "url": "https://site9.example/next.js-vs-wordpress",
+     "domain": "site9.example",
+     "title": "Next.Js Vs Wordpress",
+     "referringDomains": 5
+    },
+    {
+     "position": 10,
+     "url": "https://site10.example/next.js-vs-wordpress",
+     "domain": "site10.example",
+     "title": "Next.Js Vs Wordpress",
+     "referringDomains": 11
+    }
+   ],
+   "peopleAlsoAsk": [
+    "Is Next.js better than WordPress for SEO?",
+    "Is Next.js harder to maintain than WordPress?"
+   ],
+   "relatedSearches": [],
+   "features": [
+    "people_also_ask"
+   ]
+  },
+  "generative engine optimization": {
+   "keyword": "generative engine optimization",
+   "organic": [
+    {
+     "position": 1,
+     "url": "https://site1.example/generative-engine-optimization",
+     "domain": "site1.example",
+     "title": "Generative Engine Optimization",
+     "referringDomains": 120
+    },
+    {
+     "position": 2,
+     "url": "https://site2.example/generative-engine-optimization",
+     "domain": "site2.example",
+     "title": "Generative Engine Optimization",
+     "referringDomains": 80
+    },
+    {
+     "position": 3,
+     "url": "https://site3.example/generative-engine-optimization",
+     "domain": "site3.example",
+     "title": "Generative Engine Optimization",
+     "referringDomains": 64
+    },
+    {
+     "position": 4,
+     "url": "https://site4.example/generative-engine-optimization",
+     "domain": "site4.example",
+     "title": "Generative Engine Optimization",
+     "referringDomains": 55
+    },
+    {
+     "position": 5,
+     "url": "https://site5.example/generative-engine-optimization",
+     "domain": "site5.example",
+     "title": "Generative Engine Optimization",
+     "referringDomains": 40
+    },
+    {
+     "position": 6,
+     "url": "https://site6.example/generative-engine-optimization",
+     "domain": "site6.example",
+     "title": "Generative Engine Optimization",
+     "referringDomains": 38
+    },
+    {
+     "position": 7,
+     "url": "https://site7.example/generative-engine-optimization",
+     "domain": "site7.example",
+     "title": "Generative Engine Optimization",
+     "referringDomains": 30
+    },
+    {
+     "position": 8,
+     "url": "https://site8.example/generative-engine-optimization",
+     "domain": "site8.example",
+     "title": "Generative Engine Optimization",
+     "referringDomains": 25
+    },
+    {
+     "position": 9,
+     "url": "https://site9.example/generative-engine-optimization",
+     "domain": "site9.example",
+     "title": "Generative Engine Optimization",
+     "referringDomains": 22
+    },
+    {
+     "position": 10,
+     "url": "https://site10.example/generative-engine-optimization",
+     "domain": "site10.example",
+     "title": "Generative Engine Optimization",
+     "referringDomains": 18
+    }
+   ],
+   "peopleAlsoAsk": [
+    "What is generative engine optimization?",
+    "How is GEO different from SEO?"
+   ],
+   "relatedSearches": [],
+   "features": [
+    "ai_overview",
+    "people_also_ask"
+   ]
+  },
+  "ai agent development company": {
+   "keyword": "ai agent development company",
+   "organic": [
+    {
+     "position": 1,
+     "url": "https://site1.example/ai-agent-development-company",
+     "domain": "site1.example",
+     "title": "Ai Agent Development Company",
+     "referringDomains": 60
+    },
+    {
+     "position": 2,
+     "url": "https://site2.example/ai-agent-development-company",
+     "domain": "site2.example",
+     "title": "Ai Agent Development Company",
+     "referringDomains": 45
+    },
+    {
+     "position": 3,
+     "url": "https://site3.example/ai-agent-development-company",
+     "domain": "site3.example",
+     "title": "Ai Agent Development Company",
+     "referringDomains": 38
+    },
+    {
+     "position": 4,
+     "url": "https://site4.example/ai-agent-development-company",
+     "domain": "site4.example",
+     "title": "Ai Agent Development Company",
+     "referringDomains": 30
+    },
+    {
+     "position": 5,
+     "url": "https://site5.example/ai-agent-development-company",
+     "domain": "site5.example",
+     "title": "Ai Agent Development Company",
+     "referringDomains": 28
+    },
+    {
+     "position": 6,
+     "url": "https://site6.example/ai-agent-development-company",
+     "domain": "site6.example",
+     "title": "Ai Agent Development Company",
+     "referringDomains": 20
+    },
+    {
+     "position": 7,
+     "url": "https://site7.example/ai-agent-development-company",
+     "domain": "site7.example",
+     "title": "Ai Agent Development Company",
+     "referringDomains": 15
+    },
+    {
+     "position": 8,
+     "url": "https://site8.example/ai-agent-development-company",
+     "domain": "site8.example",
+     "title": "Ai Agent Development Company",
+     "referringDomains": 14
+    },
+    {
+     "position": 9,
+     "url": "https://site9.example/ai-agent-development-company",
+     "domain": "site9.example",
+     "title": "Ai Agent Development Company",
+     "referringDomains": 10
+    },
+    {
+     "position": 10,
+     "url": "https://site10.example/ai-agent-development-company",
+     "domain": "site10.example",
+     "title": "Ai Agent Development Company",
+     "referringDomains": 9
+    }
+   ],
+   "peopleAlsoAsk": [
+    "How much does it cost to build an AI agent?"
+   ],
+   "relatedSearches": [],
+   "features": [
+    "people_also_ask"
+   ]
+  },
+  "n8n automation services": {
+   "keyword": "n8n automation services",
+   "organic": [
+    {
+     "position": 1,
+     "url": "https://site1.example/n8n-automation-services",
+     "domain": "site1.example",
+     "title": "N8N Automation Services",
+     "referringDomains": 6
+    },
+    {
+     "position": 2,
+     "url": "https://site2.example/n8n-automation-services",
+     "domain": "site2.example",
+     "title": "N8N Automation Services",
+     "referringDomains": 4
+    },
+    {
+     "position": 3,
+     "url": "https://site3.example/n8n-automation-services",
+     "domain": "site3.example",
+     "title": "N8N Automation Services",
+     "referringDomains": 9
+    },
+    {
+     "position": 4,
+     "url": "https://site4.example/n8n-automation-services",
+     "domain": "site4.example",
+     "title": "N8N Automation Services",
+     "referringDomains": 3
+    },
+    {
+     "position": 5,
+     "url": "https://site5.example/n8n-automation-services",
+     "domain": "site5.example",
+     "title": "N8N Automation Services",
+     "referringDomains": 2
+    },
+    {
+     "position": 6,
+     "url": "https://site6.example/n8n-automation-services",
+     "domain": "site6.example",
+     "title": "N8N Automation Services",
+     "referringDomains": 5
+    },
+    {
+     "position": 7,
+     "url": "https://site7.example/n8n-automation-services",
+     "domain": "site7.example",
+     "title": "N8N Automation Services",
+     "referringDomains": 1
+    },
+    {
+     "position": 8,
+     "url": "https://site8.example/n8n-automation-services",
+     "domain": "site8.example",
+     "title": "N8N Automation Services",
+     "referringDomains": 2
+    },
+    {
+     "position": 9,
+     "url": "https://site9.example/n8n-automation-services",
+     "domain": "site9.example",
+     "title": "N8N Automation Services",
+     "referringDomains": 0
+    },
+    {
+     "position": 10,
+     "url": "https://site10.example/n8n-automation-services",
+     "domain": "site10.example",
+     "title": "N8N Automation Services",
+     "referringDomains": 3
+    }
+   ],
+   "peopleAlsoAsk": [],
+   "relatedSearches": [],
+   "features": []
+  },
+  "how much does a custom web app cost": {
+   "keyword": "how much does a custom web app cost",
+   "organic": [
+    {
+     "position": 1,
+     "url": "https://site1.example/how-much-does-a-custom-web-app-cost",
+     "domain": "site1.example",
+     "title": "How Much Does A Custom Web App Cost",
+     "referringDomains": 35
+    },
+    {
+     "position": 2,
+     "url": "https://site2.example/how-much-does-a-custom-web-app-cost",
+     "domain": "site2.example",
+     "title": "How Much Does A Custom Web App Cost",
+     "referringDomains": 30
+    },
+    {
+     "position": 3,
+     "url": "https://site3.example/how-much-does-a-custom-web-app-cost",
+     "domain": "site3.example",
+     "title": "How Much Does A Custom Web App Cost",
+     "referringDomains": 25
+    },
+    {
+     "position": 4,
+     "url": "https://site4.example/how-much-does-a-custom-web-app-cost",
+     "domain": "site4.example",
+     "title": "How Much Does A Custom Web App Cost",
+     "referringDomains": 20
+    },
+    {
+     "position": 5,
+     "url": "https://site5.example/how-much-does-a-custom-web-app-cost",
+     "domain": "site5.example",
+     "title": "How Much Does A Custom Web App Cost",
+     "referringDomains": 18
+    },
+    {
+     "position": 6,
+     "url": "https://site6.example/how-much-does-a-custom-web-app-cost",
+     "domain": "site6.example",
+     "title": "How Much Does A Custom Web App Cost",
+     "referringDomains": 12
+    },
+    {
+     "position": 7,
+     "url": "https://site7.example/how-much-does-a-custom-web-app-cost",
+     "domain": "site7.example",
+     "title": "How Much Does A Custom Web App Cost",
+     "referringDomains": 10
+    },
+    {
+     "position": 8,
+     "url": "https://site8.example/how-much-does-a-custom-web-app-cost",
+     "domain": "site8.example",
+     "title": "How Much Does A Custom Web App Cost",
+     "referringDomains": 8
+    },
+    {
+     "position": 9,
+     "url": "https://site9.example/how-much-does-a-custom-web-app-cost",
+     "domain": "site9.example",
+     "title": "How Much Does A Custom Web App Cost",
+     "referringDomains": 6
+    },
+    {
+     "position": 10,
+     "url": "https://site10.example/how-much-does-a-custom-web-app-cost",
+     "domain": "site10.example",
+     "title": "How Much Does A Custom Web App Cost",
+     "referringDomains": 4
+    }
+   ],
+   "peopleAlsoAsk": [
+    "How long does it take to build a web app?",
+    "How much does a custom web app cost?"
+   ],
+   "relatedSearches": [],
+   "features": [
+    "people_also_ask",
+    "ai_overview"
+   ]
+  }
+ },
+ "domains": {
+  "promogranade.com": {
+   "domain": "promogranade.com",
+   "authority": 14,
+   "referringDomains": 22,
+   "backlinks": 140,
+   "organicKeywords": 60,
+   "organicTraffic": 180
+  }
+ },
+ "ranked": {
+  "promogranade.com": [
+   {
+    "keyword": "next.js vs wordpress",
+    "position": 14,
+    "url": "https://promogranade.com/blog/nextjs-vs-wordpress-2025",
+    "volume": 1300,
+    "providerKd": 22,
+    "traffic": 12
+   },
+   {
+    "keyword": "what is answer engine optimization",
+    "position": 8,
+    "url": "https://promogranade.com/blog/geo-aeo-seo-2025-guide",
+    "volume": 1600,
+    "providerKd": 27,
+    "traffic": 60
+   }
+  ],
+  "rival-studio.example": [
+   {
+    "keyword": "workflow automation agency",
+    "position": 4,
+    "url": "https://rival-studio.example/automation",
+    "volume": 480,
+    "providerKd": 29,
+    "traffic": 40
+   }
+  ],
+  "other-agency.example": [
+   {
+    "keyword": "rag pipeline for business",
+    "position": 6,
+    "url": "https://other-agency.example/rag",
+    "volume": 320,
+    "providerKd": 25,
+    "traffic": 15
+   }
+  ]
+ },
+ "competitors": {
+  "promogranade.com": [
+   {
+    "domain": "rival-studio.example",
+    "sharedKeywords": 40,
+    "avgPosition": 12
+   },
+   {
+    "domain": "other-agency.example",
+    "sharedKeywords": 25,
+    "avgPosition": 18
+   }
+  ]
+ },
+ "referringDomainCounts": {},
+ "referringDomains": {
+  "promogranade.com": [
+   {
+    "domain": "clutch.co",
+    "authority": 70,
+    "backlinks": 2
+   }
+  ],
+  "rival-studio.example": [
+   {
+    "domain": "techblog.example",
+    "authority": 55,
+    "backlinks": 3
+   },
+   {
+    "domain": "devdirectory.example",
+    "authority": 48,
+    "backlinks": 1
+   },
+   {
+    "domain": "clutch.co",
+    "authority": 70,
+    "backlinks": 1
+   },
+   {
+    "domain": "startupnews.example",
+    "authority": 62,
+    "backlinks": 2
+   }
+  ],
+  "other-agency.example": [
+   {
+    "domain": "techblog.example",
+    "authority": 55,
+    "backlinks": 1
+   },
+   {
+    "domain": "devdirectory.example",
+    "authority": 48,
+    "backlinks": 2
+   },
+   {
+    "domain": "randomsite.example",
+    "authority": 20,
+    "backlinks": 1
+   }
+  ]
+ }
+}
