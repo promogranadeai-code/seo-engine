@@ -32,7 +32,7 @@ describe("FreeProvider (Google Autocomplete)", () => {
     const fetchFn = (async (url: string) => {
       const q = new URL(url).searchParams.get("q")!;
       calls.push(q);
-      const list = q.startsWith("how") ? ["how to build a website for business"] : ["website development company", "website development cost"];
+      const list = q.startsWith("how") ? ["how to build a website for business"] : q.startsWith("what") ? [q, "what is website development"] : ["website development company", "website development cost"];
       return new Response(JSON.stringify([q, list]));
     }) as unknown as typeof fetch;
     const p = new FreeProvider("in", { fetchFn, delayMs: 0, letters: false });
@@ -44,5 +44,8 @@ describe("FreeProvider (Google Autocomplete)", () => {
     expect(top.volume).toBeNull();
     expect(top.demand!).toBeGreaterThan(second.demand!);
     expect(ideas.some((k) => k.keyword.startsWith("how to"))).toBe(true);
+    // The echoed query is dropped; a different suggestion for it is kept.
+    expect(ideas.some((k) => k.keyword === "what is website development")).toBe(true);
+    expect(ideas.some((k) => k.keyword === "what website development")).toBe(false);
   });
 });

@@ -32,6 +32,7 @@ never show them to a client as real.
 | 1 | `seo add https://site.com --market in --competitors a.com,b.com [--repo ../site]` | `project.json` (edit business name/services/location here) | free |
 | 2 | `seo audit <slug>` (add `--local http://localhost:3000` for a local build) | `audit.md/json`, `crawl.json` | free |
 | 3 | `seo keywords <slug>` | `keywords.md/json` — buckets: quick-win, target-now, build-up, long-term | DataForSEO, ~$0.5–3 |
+| 3 (free) | `seo keywords <slug> --free --seeds "a,b"`, then `--planner <csv>` | same, ranked by Google Autocomplete demand until Keyword Planner volumes are imported; also `planner-upload.txt` | free |
 | 4 | `seo tags <slug>` | `tags.md/json` + `llms.txt` | free |
 | 5 | `seo timeline <slug> [--keywords "a,b"] [--goal top3] [--pace growth]` | `timeline.md` | free |
 | 6 | `seo offpage <slug>` | `offpage.md` — AI tasks vs human tasks, prospects | DataForSEO |
@@ -43,8 +44,28 @@ Markets: us, uk, in, ae, au, ca, sg (`src/config.ts`). Slug = domain with dots �
 
 ## Keys: what needs what
 
-- **DataForSEO** — needed for `keywords` and `offpage` prospects (search volumes, page-1 results,
-  backlinks). There's no way around renting this data. ~$0.5–3 per full keyword run.
+- **DataForSEO** — needed for `offpage` prospects and for SERP difficulty (page-1 results,
+  backlinks). ~$0.5–3 per full keyword run. Keyword *ideas and volumes* no longer need it: see below.
+
+## Free keyword research (no paid tool)
+
+1. `seo keywords <slug> --free --seeds "website development,seo services,..."`. This expands each seed
+   through Google Autocomplete (modifiers, question words, a–z; about 46 calls per seed, cached in
+   `autocomplete-cache.json`). Keywords are ranked by a 0–100 *demand* score: Google lists more-searched
+   suggestions first. It writes `planner-upload.txt`.
+2. In Google Ads, open Keyword Planner. It is free; an account without running ads is enough. Choose
+   "Get search volume and forecasts", upload `planner-upload.txt`, pick the country, and download the CSV.
+3. `seo keywords <slug> --planner <file.csv> --seeds "<same seeds>"` adds real volume ranges (for example
+   "1K – 10K", read as about 3.2K), competition and bids.
+
+Search Console queries (free) are merged automatically once `GSC_*` is configured.
+
+If the machine cannot reach Google (as in Claude's cloud workspace), fill the cache elsewhere with
+`npx tsx scripts/suggest-cache.ts <market> "<seeds>" > autocomplete-cache.json` (on your laptop, or in a
+Vercel Sandbox with `suggestqueries.google.com` allowed), copy the file into `data/projects/<slug>/`, and run
+step 1 with the same seeds.
+
+Free mode has no SERP, backlink or competitor data, so KD shows "?" and rankability rests on relevance.
 - **Anthropic API key — optional.** Writing, buyer questions and interview tailoring run inside
   Claude Code under the team's Claude plan (`seo write` makes a brief, Claude writes it, `seo check`
   grades it — see `seo-write`). The key only enables unattended `--via api` runs. Never wire a

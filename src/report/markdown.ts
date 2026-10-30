@@ -70,7 +70,7 @@ export function keywordsMarkdown(r: KeywordReport): string {
     out.push(
       table(
         ["Keyword", "Volume", "KD", "Rankability", "Intent", "Now", "Clicks @#3", "Opportunity"],
-        ks.map((k) => [k.keyword, k.volume ?? (k.demand != null ? `? (demand ${k.demand})` : "?"), k.kd !== null ? `${k.kd} (${k.kdLabel})` : "?", k.rankability, k.intent, k.currentPosition ? `#${k.currentPosition}` : "—", k.clicksAtTop3 + (k.aiOverview ? " (AI Overview)" : ""), k.opportunity]),
+        ks.map((k) => [k.keyword, k.volume ?? (k.demand != null ? `? (demand ${k.demand})` : "?"), k.kd !== null ? `${k.kd} (${k.kdLabel})` : "?", k.rankability, k.intent, k.currentPosition ? `#${k.currentPosition}` : "—", k.volume === null ? "—" : k.clicksAtTop3 + (k.aiOverview ? " (AI Overview)" : ""), k.opportunity]),
       ),
       "",
     );

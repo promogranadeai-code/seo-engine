@@ -65,8 +65,11 @@ export class FreeProvider implements SeoDataProvider {
   async keywordIdeas(seeds: string[], m: Market, limit: number): Promise<KeywordMetrics[]> {
     // demand: best (lowest) suggestion position seen, and how many expansions surfaced the phrase.
     const seen = new Map<string, { best: number; hits: number }>();
-    const add = (list: string[]) =>
+    // Google often echoes the typed query back as the first suggestion; that says nothing about demand,
+    // except for the bare seed itself.
+    const add = (list: string[], query: string, seed: string) =>
       list.forEach((s, i) => {
+        if (s === query.toLowerCase() && query !== seed) return;
         const cur = seen.get(s);
         seen.set(s, { best: Math.min(cur?.best ?? 99, i), hits: (cur?.hits ?? 0) + 1 });
       });
@@ -78,7 +81,7 @@ export class FreeProvider implements SeoDataProvider {
       ];
       for (const q of queries) {
         try {
-          add(await this.suggest(q, m));
+          add(await this.suggest(q, m), q, seed);
         } catch {
           // One failed expansion is not fatal; carry on with the rest.
         }
