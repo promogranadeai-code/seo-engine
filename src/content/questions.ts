@@ -27,7 +27,14 @@ const toQuestion = (s: string) => {
  * Collect the questions real people ask: Google "People also ask", question-type
  * keywords, and (optionally) buyer questions Claude infers from the business profile.
  */
-export async function mineQuestions(project: Project, keywords: KeywordReport | null, crawl: CrawlResult | null, llm: Llm | null): Promise<MinedQuestion[]> {
+export async function mineQuestions(
+  project: Project,
+  keywords: KeywordReport | null,
+  crawl: CrawlResult | null,
+  llm: Llm | null,
+  /** Buyer questions supplied by hand or by Claude Code (no API key needed). */
+  extra: string[] = [],
+): Promise<MinedQuestion[]> {
   const raw: { q: string; source: string; volume: number | null; kw: string | null }[] = [];
   for (const p of keywords?.questions ?? []) raw.push({ q: p.question, source: "people-also-ask", volume: null, kw: p.keyword });
   for (const k of keywords?.keywords ?? []) {
@@ -42,6 +49,8 @@ export async function mineQuestions(project: Project, keywords: KeywordReport | 
     );
     for (const q of res.questions) raw.push({ q, source: "buyer-questions (Claude)", volume: null, kw: null });
   }
+
+  for (const q of extra) if (q.trim()) raw.push({ q, source: "buyer-questions", volume: null, kw: null });
 
   const siteHeadings = (crawl?.pages ?? []).flatMap((p) => p.questionHeadings.map((h) => ({ h, url: p.finalUrl })));
   const out: MinedQuestion[] = [];

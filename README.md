@@ -22,7 +22,7 @@ Semrush (their published methods) and OpenSEO (open source). Add a website and i
 
 ```bash
 npm ci
-cp .env.example .env          # DataForSEO login/password, Anthropic API key
+cp .env.example .env          # DataForSEO login/password (Anthropic API key optional)
 npm test                      # offline test suite
 
 npm run seo -- add https://example.com --market us --competitors rival.com
@@ -33,7 +33,8 @@ npm run seo -- timeline example-com --pace growth
 npm run seo -- offpage example-com
 npm run seo -- questions example-com
 npm run seo -- interview example-com --topic "how much does a website cost"
-npm run seo -- write example-com --topic "how much does a website cost" --keyword "website cost"
+npm run seo -- write example-com --topic "how much does a website cost" --keyword "website cost"   # brief → Claude Code writes it
+npm run seo -- check example-com --topic "how much does a website cost"
 npm run seo -- report example-com
 ```
 
@@ -56,8 +57,10 @@ questions". Three skills guide it:
 ## Costs
 
 - **DataForSEO:** pay as you go, about $0.5–3 per full keyword run on one site.
-  The minimum top-up is $50.
-- **Claude:** writing calls only.
+  The minimum top-up is $50. This is the only key the core needs.
+- **Claude:** no extra cost when you work inside Claude Code. `seo write` makes a
+  brief, Claude writes the article under your existing Claude plan, and `seo check`
+  grades it. An Anthropic API key is only for unattended runs (`--via api`).
 - **Google Search Console:** free.
 
 ## How it works

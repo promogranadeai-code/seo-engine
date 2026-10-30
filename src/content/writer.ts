@@ -77,18 +77,49 @@ KNOWLEDGE (first-party notes):
 ${i.knowledge || "(none provided)"}`;
 }
 
+/** Publishing bar shared by the API writer, `seo check` and the seo-write skill. */
+export const QUALITY_BAR = { voice: 85, aeo: 70 };
+
+export const passesBar = (lint: LintResult, aeo: AeoResult): boolean => lint.score >= QUALITY_BAR.voice && aeo.aeoScore >= QUALITY_BAR.aeo;
+
+/** What to fix in the next revision (unresolved [NEEDS DATA] markers are left for a person). */
+export function revisionNotes(lint: LintResult, aeo: AeoResult): string[] {
+  return [
+    ...lint.findings.filter((f) => f.rule !== "needs-data").map((f) => `- ${f.message}${f.examples.length ? ` (${f.examples.join("; ")})` : ""}`),
+    ...aeo.advice.map((a) => `- ${a}`),
+  ];
+}
+
+/**
+ * Self-contained writing brief for Claude Code mode: Claude (running under the
+ * team's own Claude plan) writes the draft from this file — no API key needed.
+ */
+export function buildBrief(input: WriteInput, draftPath: string): string {
+  return `# Writing brief: ${input.topic}
+
+Write the article described below and save it to \`${draftPath}\`.
+Then run \`npm run seo -- check ${input.project.slug} --topic "${input.topic}"\` and revise until it reports PASS
+(voice ≥ ${QUALITY_BAR.voice}, AEO ≥ ${QUALITY_BAR.aeo}). Do not add facts that aren't in the interview or knowledge below.
+
+## Rules
+
+${writerSystemPrompt(input.project)}
+
+## Inputs
+
+${userPrompt(input)}
+`;
+}
+
 export async function writeArticle(llm: Llm, input: WriteInput, opts: { maxRevisions?: number; minScore?: number } = {}): Promise<WriteResult> {
   const system = writerSystemPrompt(input.project);
   let markdown = await llm.text(system, userPrompt(input), { effort: "high" });
   let lint = lintText(markdown);
   let aeo = checkAeo(markdown);
   let revisions = 0;
-  const minScore = opts.minScore ?? 85;
-  while (revisions < (opts.maxRevisions ?? 2) && (lint.score < minScore || aeo.aeoScore < 70)) {
-    const problems = [
-      ...lint.findings.filter((f) => f.rule !== "needs-data").map((f) => `- ${f.message}${f.examples.length ? ` (${f.examples.join("; ")})` : ""}`),
-      ...aeo.advice.map((a) => `- ${a}`),
-    ];
+  const minScore = opts.minScore ?? QUALITY_BAR.voice;
+  while (revisions < (opts.maxRevisions ?? 2) && (lint.score < minScore || aeo.aeoScore < QUALITY_BAR.aeo)) {
+    const problems = revisionNotes(lint, aeo);
     if (!problems.length) break;
     markdown = await llm.text(
       system,

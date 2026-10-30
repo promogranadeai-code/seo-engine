@@ -8,7 +8,7 @@ import { checkAeo } from "./content/aeo.js";
 import { buildInterview, interviewHasAnswers } from "./content/interview.js";
 import { lintText } from "./content/lint.js";
 import { groupQuestions, mineQuestions, type MinedQuestion } from "./content/questions.js";
-import { loadKnowledge, writeArticle } from "./content/writer.js";
+import { buildBrief, loadKnowledge, passesBar, QUALITY_BAR, revisionNotes, writeArticle } from "./content/writer.js";
 import { crawlSite, type CrawlResult } from "./crawl/crawler.js";
 import { researchKeywords, type KeywordReport } from "./keywords/research.js";
 import { llmConfigured, requireLlm } from "./llm/claude.js";
@@ -229,14 +229,21 @@ program
   .command("questions")
   .argument("<project>")
   .description("AEO/GEO: the questions people ask (People-also-ask, keywords, buyer questions)")
-  .option("--no-ai", "don't ask Claude for buyer questions")
+  .option("--add <list>", "pipe-separated buyer questions to add (saved in buyer-questions.txt; this is how Claude Code adds them)")
+  .option("--no-ai", "don't call the Anthropic API for buyer questions")
   .action(async (slug: string, o) => {
     const p = loadProject(slug);
+    const savedFile = path.join(projectDir(slug), "buyer-questions.txt");
+    const saved = fs.existsSync(savedFile) ? fs.readFileSync(savedFile, "utf8").split("\n").filter(Boolean) : [];
+    const added: string[] = o.add?.split("|").map((q: string) => q.trim()).filter(Boolean) ?? [];
+    const extra = [...new Set([...saved, ...added])];
+    if (added.length) writeText(slug, "buyer-questions.txt", extra.join("\n") + "\n");
     const llm = o.ai && llmConfigured() ? requireLlm() : null;
-    const qs = await mineQuestions(p, readJson<KeywordReport>(slug, "keywords.json"), readJson<CrawlResult>(slug, "crawl.json"), llm);
+    const qs = await mineQuestions(p, readJson<KeywordReport>(slug, "keywords.json"), readJson<CrawlResult>(slug, "crawl.json"), llm, extra);
     writeJson(slug, "questions.json", { questions: qs, groups: groupQuestions(qs) });
     done(writeText(slug, "questions.md", questionsMarkdown(p.domain, qs)));
     console.log(`${qs.length} questions (${qs.filter((q) => !q.answeredOn).length} not yet answered on the site).`);
+    if (!llm && !extra.length) console.log("Tip: in Claude Code, ask Claude to suggest buyer questions and add them with --add \"q1|q2|…\" (uses your Claude plan, no API key).");
   });
 
 const topicSlug = (t: string) => tokens(t).slice(0, 8).join("-");
@@ -263,6 +270,7 @@ program
   .requiredOption("--topic <topic>")
   .requiredOption("--keyword <keyword>", "primary keyword")
   .option("--words <n>", "target length", "1400")
+  .option("--via <engine>", "claude-code (brief for Claude Code, uses your Claude plan) | api (Anthropic API key) | auto", "auto")
   .description("Write an original, human-voiced article from the expert interview + knowledge files")
   .action(async (slug: string, o) => {
     const p = loadProject(slug);
@@ -271,12 +279,40 @@ program
     const interview = fs.readFileSync(file, "utf8");
     if (!interviewHasAnswers(interview)) throw new Error(`${path.relative(process.cwd(), file)} has fewer than 3 real answers. Fill it in first — the article is written only from these answers.`);
     const questions = [...interview.matchAll(/^- (.+\?)$/gm)].map((m) => m[1]!);
-    log("Writing (Claude) …");
-    const res = await writeArticle(requireLlm(), { project: p, topic: o.topic, primaryKeyword: o.keyword, questions, interview, knowledge: loadKnowledge(slug), wordTarget: Number(o.words) });
+    const input = { project: p, topic: o.topic, primaryKeyword: o.keyword, questions, interview, knowledge: loadKnowledge(slug), wordTarget: Number(o.words) };
     const base = path.join("drafts", topicSlug(o.topic));
+    const via = o.via === "auto" ? (llmConfigured() ? "api" : "claude-code") : o.via;
+    if (via === "claude-code") {
+      const draftPath = path.relative(process.cwd(), path.join(projectDir(slug), `${base}.md`));
+      done(writeText(slug, `${base}.brief.md`, buildBrief(input, draftPath)));
+      console.log(`Brief ready. In Claude Code (your Claude plan, no API key) say:\n  "Write the draft from ${path.relative(process.cwd(), path.join(projectDir(slug), `${base}.brief.md`))}"\nThen check it: npm run seo -- check ${slug} --topic "${o.topic}"`);
+      return;
+    }
+    if (via !== "api") throw new Error(`Unknown --via "${o.via}" (use claude-code, api or auto)`);
+    log("Writing (Anthropic API) …");
+    const res = await writeArticle(requireLlm(), input);
     done(writeText(slug, `${base}.md`, res.markdown));
     done(writeText(slug, `${base}.check.md`, lintMarkdown(`${base}.md`, res.lint, res.aeo)));
     console.log(`Voice ${res.lint.score}/100 · AEO ${res.aeo.aeoScore} · GEO ${res.aeo.geoScore} · ${res.revisions} revision(s). A person must review and fill any [NEEDS DATA] before publishing.`);
+  });
+
+program
+  .command("check")
+  .argument("<project>")
+  .requiredOption("--topic <topic>")
+  .description("Grade a draft (voice, AEO, GEO); prints PASS or the exact revision notes")
+  .action((slug: string, o) => {
+    const base = path.join("drafts", topicSlug(o.topic));
+    const file = path.join(projectDir(slug), `${base}.md`);
+    if (!fs.existsSync(file)) throw new Error(`No draft at ${path.relative(process.cwd(), file)} yet.`);
+    const md = fs.readFileSync(file, "utf8");
+    const lint = lintText(md);
+    const aeo = checkAeo(md);
+    done(writeText(slug, `${base}.check.md`, lintMarkdown(`${base}.md`, lint, aeo)));
+    const todos = (md.match(/\[NEEDS DATA[^\]]*\]/g) ?? []).length;
+    console.log(`Voice ${lint.score}/100 · AEO ${aeo.aeoScore} · GEO ${aeo.geoScore} · ${todos} [NEEDS DATA] left for a person`);
+    if (passesBar(lint, aeo)) console.log("PASS — ready for human review.");
+    else console.log(`NEEDS REVISION (voice ≥ ${QUALITY_BAR.voice}, AEO ≥ ${QUALITY_BAR.aeo}):\n${revisionNotes(lint, aeo).join("\n")}`);
   });
 
 program

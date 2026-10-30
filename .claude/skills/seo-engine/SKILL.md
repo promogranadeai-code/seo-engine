@@ -16,9 +16,9 @@ use `seo-write`. Formulas and sources: `docs/METHODOLOGY.md`.
 ## Setup (once)
 
 ```bash
-npm ci && cp .env.example .env   # add DATAFORSEO_LOGIN/PASSWORD + ANTHROPIC_API_KEY
+npm ci && cp .env.example .env   # add DATAFORSEO_LOGIN/PASSWORD (ANTHROPIC_API_KEY optional)
 npm run build                     # or use `npm run seo -- …` (tsx) without building
-npm test                          # 23 tests, all offline
+npm test                          # 26 tests, all offline
 ```
 
 Without DataForSEO keys, `keywords`/`offpage` can run on demo data with
@@ -35,10 +35,20 @@ never show them to a client as real.
 | 4 | `seo tags <slug>` | `tags.md/json` + `llms.txt` | free |
 | 5 | `seo timeline <slug> [--keywords "a,b"] [--goal top3] [--pace growth]` | `timeline.md` | free |
 | 6 | `seo offpage <slug>` | `offpage.md` — AI tasks vs human tasks, prospects | DataForSEO |
-| 7 | `seo questions <slug>` | `questions.md` — AEO/GEO questions | Claude (small) |
+| 7 | `seo questions <slug> [--add "Q1?\|Q2?"]` | `questions.md` — AEO/GEO questions | free |
 | 8 | `seo report <slug>` | `report.md` — one-page client summary | free |
 
 Markets: us, uk, in, ae, au, ca, sg (`src/config.ts`). Slug = domain with dots → dashes.
+
+## Keys: what needs what
+
+- **DataForSEO** — needed for `keywords` and `offpage` prospects (search volumes, page-1 results,
+  backlinks). There's no way around renting this data. ~$0.5–3 per full keyword run.
+- **Anthropic API key — optional.** Writing, buyer questions and interview tailoring run inside
+  Claude Code under the team's Claude plan (`seo write` makes a brief, Claude writes it, `seo check`
+  grades it — see `seo-write`). The key only enables unattended `--via api` runs. Never wire a
+  Claude plan login into the CLI; plan logins are for Claude's own apps.
+- Free with no keys: `add`, `audit`, `tags`, `lint`, `check`, `interview`, `offpage --offline`.
 
 ## Reading the numbers (explain these to clients)
 

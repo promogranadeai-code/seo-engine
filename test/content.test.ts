@@ -4,7 +4,7 @@ import { checkAeo } from "../src/content/aeo.js";
 import { buildInterview, interviewHasAnswers } from "../src/content/interview.js";
 import { lintText } from "../src/content/lint.js";
 import { groupQuestions, mineQuestions } from "../src/content/questions.js";
-import { writeArticle, writerSystemPrompt } from "../src/content/writer.js";
+import { buildBrief, passesBar, revisionNotes, writeArticle, writerSystemPrompt } from "../src/content/writer.js";
 import type { Llm } from "../src/llm/claude.js";
 import type { KeywordReport } from "../src/keywords/research.js";
 import type { Project } from "../src/store.js";
@@ -93,5 +93,27 @@ describe("writer", () => {
     expect(llm.prompts[1]).toContain("stock phrase");
     expect(res.lint.score).toBeGreaterThan(70);
     expect(res.aeo.questions.length).toBe(2);
+  });
+});
+
+describe("Claude Code mode (no API key)", () => {
+  const input = { project, topic: "website cost", primaryKeyword: "next.js website cost", questions: ["How much does a Next.js website cost?"], interview: "Q: cost? A: $4k–$9k", knowledge: "Pricing sheet 2026" };
+  it("brief is self-contained: rules, inputs, save path and check command", () => {
+    const brief = buildBrief(input, "data/projects/acme/drafts/website-cost.md");
+    expect(brief).toContain("data/projects/acme/drafts/website-cost.md");
+    expect(brief).toContain("npm run seo -- check acme --topic \"website cost\"");
+    expect(brief).toContain("[NEEDS DATA");
+    expect(brief).toContain("Q: cost? A: $4k–$9k");
+    expect(brief).toContain("Pricing sheet 2026");
+  });
+  it("check gives actionable notes until the draft passes", () => {
+    const weak = `# Cost\n\n## How much does it cost?\n\nIt depends.\n`;
+    expect(passesBar(lintText(weak), checkAeo(weak))).toBe(false);
+    expect(revisionNotes(lintText(weak), checkAeo(weak)).join("\n")).toMatch(/direct|question/i);
+  });
+  it("hand-added buyer questions are merged with mined ones", async () => {
+    const qs = await mineQuestions(project, null, null, null, ["Can you migrate our WordPress site?", "can you migrate our wordpress site"]);
+    expect(qs).toHaveLength(1);
+    expect(qs[0]!.sources).toEqual(["buyer-questions"]);
   });
 });
