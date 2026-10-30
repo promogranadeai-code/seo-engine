@@ -15,6 +15,7 @@ import { llmConfigured, requireLlm } from "./llm/claude.js";
 import { buildOffpagePlan } from "./offpage/plan.js";
 import { DataForSeoProvider } from "./providers/dataforseo.js";
 import { FixtureProvider } from "./providers/fixture.js";
+import { FreeProvider } from "./providers/free.js";
 import { gscConfigured, gscQueryPages } from "./providers/gsc.js";
 import type { SeoDataProvider } from "./providers/types.js";
 import { visibilityMarkdown, auditMarkdown, keywordsMarkdown, lintMarkdown, offpageMarkdown, questionsMarkdown, tagsMarkdown, timelineMarkdown } from "./report/markdown.js";
@@ -138,9 +139,13 @@ program
   .option("--min-volume <n>", "ignore keywords below this monthly volume", "10")
   .option("--no-competitors", "skip competitor keyword gap")
   .option("--demo <fixture>", "use a fixture JSON instead of DataForSEO (demo/testing)")
+  .option("--free", "no paid API: ideas from Google Autocomplete, volumes from a Keyword Planner CSV (--planner)")
+  .option("--planner <csv>", "Google Keyword Planner export with search volumes (implies --free)")
   .action(async (slug: string, o) => {
     const p = loadProject(slug);
     const crawl = readJson<CrawlResult>(slug, "crawl.json");
+    const free = o.free || o.planner ? new FreeProvider(p.market, { plannerCsv: o.planner, cacheFile: path.join(projectDir(slug), "autocomplete-cache.json") }) : null;
+    if (free) log(`Using ${free.name}`);
     let gscRows;
     if (gscConfigured()) {
       try {
@@ -150,7 +155,7 @@ program
         log(`Search Console skipped: ${(e as Error).message}`);
       }
     }
-    const report = await researchKeywords(p, crawl, provider(o.demo), {
+    const report = await researchKeywords(p, crawl, free ?? provider(o.demo), {
       market: market(p.market),
       marketCode: p.market,
       seeds: o.seeds?.split(",").map((s: string) => s.trim()),
@@ -162,6 +167,12 @@ program
     });
     writeJson(slug, "keywords.json", report);
     done(writeText(slug, "keywords.md", keywordsMarkdown(report)));
+    if (free && !o.planner) {
+      // Keyword Planner's "Get search volume and forecasts" takes this file as an upload.
+      const upload = report.keywords.filter((k) => k.bucket !== "off-topic").map((k) => k.keyword);
+      done(writeText(slug, "planner-upload.txt", upload.join("\n") + "\n"));
+      log(`Next (free volumes): upload planner-upload.txt in Google Keyword Planner → "Get search volume and forecasts", download the CSV, then run: seo keywords ${slug} --planner <file.csv>`);
+    }
     const by = (b: string) => report.keywords.filter((k) => k.bucket === b).length;
     console.log(`${report.keywords.length} keywords: ${by("quick-win")} quick wins, ${by("target-now")} target-now, ${by("build-up")} build-up, ${by("long-term")} long-term. ${report.clusters.length} page clusters. Data cost $${report.spentUsd}.`);
   });

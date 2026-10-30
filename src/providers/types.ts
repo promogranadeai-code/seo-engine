@@ -13,6 +13,8 @@ export interface KeywordMetrics {
   intent: Intent | null;
   /** Last 12 months of volume, oldest first. */
   trend: number[];
+  /** 0–100 popularity proxy from Google Autocomplete order, used when no volume is known (free provider). */
+  demand?: number | null;
 }
 
 export interface SerpItem {

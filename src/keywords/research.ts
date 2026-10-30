@@ -11,6 +11,8 @@ export type Bucket = "quick-win" | "target-now" | "build-up" | "long-term" | "of
 export interface ScoredKeyword {
   keyword: string;
   volume: number | null;
+  /** 0–100 Autocomplete popularity proxy when volume is unknown (free provider). */
+  demand: number | null;
   cpc: number | null;
   intent: Intent;
   /** KD from our Ahrefs-style formula (top-10 RDs) when SERP data exists, else provider KD. */
@@ -229,7 +231,9 @@ export async function researchKeywords(project: Project, crawl: CrawlResult | nu
   const minVolume = opts.minVolume ?? 10;
   const pre = [...cands.entries()]
     .map(([kw, c]) => ({ kw, c, relevance: relevanceOf(kw, corpus) }))
-    .filter(({ c }) => (c.metrics?.volume ?? 0) >= minVolume || c.pos !== null);
+    .filter(({ c }) => (c.metrics?.volume ?? 0) >= minVolume || c.pos !== null || (c.metrics?.volume == null && (c.metrics?.demand ?? 0) > 0));
+  // Without a volume (free provider, before a Keyword Planner import), the Autocomplete demand score ranks the keyword instead.
+  const rankVolume = (c: Cand) => c.metrics?.volume ?? c.metrics?.demand ?? 0;
 
   // Provisional ranking (provider KD) decides which keywords get a paid SERP analysis.
   const provisional = pre
@@ -237,7 +241,7 @@ export async function researchKeywords(project: Project, crawl: CrawlResult | nu
     .map((x) => {
       const r = rankability({ kd: x.c.metrics?.providerKd ?? null, serpMedianRd: null, serpMedianAuthority: null, ourAuthority, ourReferringDomains: ourRd, relevance: x.relevance, currentPosition: x.c.pos }).score;
       const intent = x.c.metrics?.intent ?? guessIntent(x.kw, brandTerms);
-      return { ...x, prov: opportunity({ volume: x.c.metrics?.volume ?? 0, cpc: x.c.metrics?.cpc ?? 0, intent, rankability: r, aiOverview: false }) };
+      return { ...x, prov: opportunity({ volume: rankVolume(x.c), cpc: x.c.metrics?.cpc ?? 0, intent, rankability: r, aiOverview: false }) };
     })
     .sort((a, b) => b.prov - a.prov);
 
@@ -277,6 +281,7 @@ export async function researchKeywords(project: Project, crawl: CrawlResult | nu
     const k: ScoredKeyword = {
       keyword: kw,
       volume: c.metrics?.volume ?? null,
+      demand: c.metrics?.volume == null ? (c.metrics?.demand ?? null) : null,
       cpc: c.metrics?.cpc ?? null,
       intent,
       kd,
@@ -286,7 +291,7 @@ export async function researchKeywords(project: Project, crawl: CrawlResult | nu
       relevance,
       rankability: r.score,
       rankabilityReasons: r.reasons,
-      opportunity: opportunity({ volume: c.metrics?.volume ?? 0, cpc: c.metrics?.cpc ?? 0, intent, rankability: r.score, aiOverview }),
+      opportunity: opportunity({ volume: rankVolume(c), cpc: c.metrics?.cpc ?? 0, intent, rankability: r.score, aiOverview }),
       clicksAtTop3: estimatedClicks(c.metrics?.volume ?? 0, 3, aiOverview),
       currentPosition: c.pos,
       rankingUrl: c.url,
@@ -309,6 +314,9 @@ export async function researchKeywords(project: Project, crawl: CrawlResult | nu
   });
 
   const questions = [...serpData.entries()].flatMap(([keyword, d]) => d.paa.map((question) => ({ question, keyword })));
+  // Without People-also-ask data, question-shaped Autocomplete suggestions are the questions people type.
+  if (!questions.length)
+    for (const k of relevant) if (/^(how|what|why|which|who|when|where|can|is|are|does|do|should)\b/.test(k.keyword)) questions.push({ question: k.keyword, keyword: k.keyword });
 
   return {
     generatedAt: new Date().toISOString(),
