@@ -89,6 +89,7 @@ describe("wordsJoined", () => {
     expect(wordsJoined("Website Development")).toBe(false);
     expect(wordsJoined("SEO/GEO/AEO services")).toBe(false);
     expect(wordsJoined("Next.js vs WordPress")).toBe(false);
+    expect(wordsJoined("Apple's first touchscreen MacBook: what it means")).toBe(false);
   });
 });
 

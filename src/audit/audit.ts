@@ -218,7 +218,7 @@ export function auditCrawl(crawl: CrawlResult): AuditResult {
 
 /** Real words that are legitimately CamelCase — never flag these. */
 const CAMEL_OK = new Set(
-  ("wordpress woocommerce hubspot linkedin youtube javascript typescript github gitlab paypal iphone ipad macos ios ecommerce devops chatgpt openai " +
+  ("wordpress macbook imac airpods airtag facetime icloud ipados watchos visionos woocommerce hubspot linkedin youtube javascript typescript github gitlab paypal iphone ipad macos ios ecommerce devops chatgpt openai " +
     "postgresql mysql mongodb nextjs nodejs tiktok whatsapp sharepoint powerpoint quickbooks fedex saas deepseek semrush adwords bigcommerce clickup " +
     "mailchimp sendgrid cloudflare digitalocean fastapi graphql nosql phd iot airbnb dropbox salesforce shopify mcdonalds playstation photoshop " +
     "webflow netlify vercel supabase firebase").split(" "),
