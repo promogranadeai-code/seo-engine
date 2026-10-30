@@ -47,6 +47,19 @@ Markets: us, uk, in, ae, au, ca, sg (`src/config.ts`). Slug = domain with dots �
 - **DataForSEO** — needed for `offpage` prospects and for SERP difficulty (page-1 results,
   backlinks). ~$0.5–3 per full keyword run. Keyword *ideas and volumes* no longer need it: see below.
 
+## Search Console setup from the command line
+
+`scripts/gsc-setup.sh` sets up a Search Console property through Google's APIs using gcloud. It must run where
+gcloud is signed in, which is the owner's computer: Claude's cloud workspace has no Google login. The steps:
+
+1. `login`: sign in with the webmasters and siteverification scopes, then enable both APIs.
+2. `token <site>`: prints the meta-tag value. For promogranade.com it goes in Vercel env
+   `GOOGLE_SITE_VERIFICATION`; the layout already reads it. Redeploy.
+3. `finish <site>`: verifies ownership, adds the URL-prefix property and submits `sitemap.xml`.
+4. `status <site>`: sitemap state and the URL Inspection verdict for the key pages.
+
+No API can request indexing. That stays a button in Search Console.
+
 ## Free keyword research (no paid tool)
 
 1. `seo keywords <slug> --free --seeds "website development,seo services,..."`. This expands each seed
