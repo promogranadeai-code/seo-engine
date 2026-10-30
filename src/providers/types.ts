@@ -64,6 +64,17 @@ export interface Competitor {
   avgPosition: number | null;
 }
 
+/** AI answer engines we can query (DataForSEO ai_optimization slugs). */
+export type AiEngine = "chat_gpt" | "claude" | "gemini" | "perplexity";
+
+export interface AiAnswer {
+  engine: AiEngine;
+  model: string;
+  prompt: string;
+  text: string;
+  citations: { url: string; title: string | null }[];
+}
+
 export interface Market {
   locationCode: number;
   languageCode: string;
@@ -82,4 +93,6 @@ export interface SeoDataProvider {
   /** Referring-domain counts for many URLs/domains at once. */
   referringDomainCounts(targets: string[]): Promise<Record<string, number>>;
   referringDomains(target: string, limit: number): Promise<ReferringDomain[]>;
+  /** Ask an AI engine a question (with web search) and return its answer + cited sources. */
+  aiAnswer?(engine: AiEngine, prompt: string, opts?: { countryIso?: string }): Promise<AiAnswer>;
 }

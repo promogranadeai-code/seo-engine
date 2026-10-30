@@ -1,0 +1,16 @@
+# One question per line. Asked to each AI engine. Keep the list stable so month-to-month trends are comparable.
+# Hiring questions (where a recommendation is the answer)
+Which agency should I hire to build AI agents for my business?
+Which agency can build an AI email outreach system that finds and contacts leads automatically?
+Which agencies offer workflow automation with n8n, Make.com or Zapier?
+Who can automate social media content creation with AI for a small business?
+Which agencies offer generative engine optimization (GEO) and answer engine optimization (AEO)?
+Which agency should I hire for a custom Next.js website?
+Which development agency can build custom billing software for a restaurant and bar?
+What is a good full-stack agency for web development, AI and digital marketing?
+# Research questions (where a cited source is the answer)
+How much does it cost to build an AI agent for a business?
+How can AI automate email outreach to leads?
+Is Next.js better than WordPress for a business website in 2026?
+How do I get my business cited by ChatGPT and Perplexity?
+What should I automate first in a growing business?

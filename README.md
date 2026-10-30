@@ -15,7 +15,10 @@ Semrush (their published methods) and OpenSEO (open source). Add a website and i
    copied from the web. A voice linter catches generic, AI-sounding prose.
 5. **Plans off-page work.** It finds backlink-gap prospects and splits the plan
    into what AI does by itself and what a person must do, with a 4-week start.
-6. **Estimates the ranking timeline.** It gives optimistic, expected and
+6. **Tracks AI visibility.** It asks ChatGPT, Perplexity, Gemini and Claude your
+   buyers' questions every month and shows whether you're mentioned or cited,
+   which competitors are, and which sites the AI engines rely on.
+7. **Estimates the ranking timeline.** It gives optimistic, expected and
    conservative months per keyword, plus a month-by-month roadmap.
 
 ## Quick start
@@ -35,6 +38,9 @@ npm run seo -- questions example-com
 npm run seo -- interview example-com --topic "how much does a website cost"
 npm run seo -- write example-com --topic "how much does a website cost" --keyword "website cost"   # brief → Claude Code writes it
 npm run seo -- check example-com --topic "how much does a website cost"
+npm run seo -- visibility example-com --init   # review visibility-prompts.txt, then:
+npm run seo -- visibility example-com --dry-run
+npm run seo -- visibility example-com
 npm run seo -- report example-com
 ```
 
@@ -75,6 +81,7 @@ src/
   providers/  DataForSEO, Google Search Console, offline fixtures
   keywords/   difficulty, rankability, opportunity, clustering, research pipeline
   timeline/   time-to-rank model + roadmap
+  visibility/ AI answer tracking: mentions, citations, share of voice
   offpage/    backlink gap + AI/human plan
   content/    questions, expert interview, writer, voice linter, AEO/GEO checks
   llm/        Claude client

@@ -20,6 +20,8 @@ export interface Project {
     services?: string[];
     audience?: string;
     location?: string;
+    /** Other spellings/names that count as a brand mention in AI answers. */
+    aliases?: string[];
   };
   competitors?: string[];
   targetKeywords?: string[];

@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { Competitor, DomainOverview, KeywordMetrics, RankedKeyword, ReferringDomain, Serp, SeoDataProvider } from "./types.js";
+import type { AiAnswer, AiEngine, Competitor, DomainOverview, KeywordMetrics, RankedKeyword, ReferringDomain, Serp, SeoDataProvider } from "./types.js";
 
 /**
  * Offline provider backed by a JSON file. Used by tests and `--demo` runs.
@@ -14,6 +14,8 @@ export interface FixtureData {
   competitors: Record<string, Competitor[]>;
   referringDomainCounts: Record<string, number>;
   referringDomains: Record<string, ReferringDomain[]>;
+  /** "<engine>|<prompt>" → canned answer. */
+  aiAnswers?: Record<string, { text: string; citations: { url: string; title: string | null }[] }>;
 }
 
 export class FixtureProvider implements SeoDataProvider {
@@ -51,5 +53,9 @@ export class FixtureProvider implements SeoDataProvider {
   }
   async referringDomains(target: string, limit: number) {
     return (this.data.referringDomains[target] ?? []).slice(0, limit);
+  }
+  async aiAnswer(engine: AiEngine, prompt: string): Promise<AiAnswer> {
+    const a = this.data.aiAnswers?.[`${engine}|${prompt}`] ?? { text: "", citations: [] };
+    return { engine, model: "fixture", prompt, ...a };
   }
 }

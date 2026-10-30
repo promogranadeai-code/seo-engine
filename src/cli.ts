@@ -17,10 +17,12 @@ import { DataForSeoProvider } from "./providers/dataforseo.js";
 import { FixtureProvider } from "./providers/fixture.js";
 import { gscConfigured, gscQueryPages } from "./providers/gsc.js";
 import type { SeoDataProvider } from "./providers/types.js";
-import { auditMarkdown, keywordsMarkdown, lintMarkdown, offpageMarkdown, questionsMarkdown, tagsMarkdown, timelineMarkdown } from "./report/markdown.js";
+import { visibilityMarkdown, auditMarkdown, keywordsMarkdown, lintMarkdown, offpageMarkdown, questionsMarkdown, tagsMarkdown, timelineMarkdown } from "./report/markdown.js";
 import { listProjects, loadProject, projectDir, readJson, saveProject, slugify, writeJson, writeText, type Project } from "./store.js";
 import { buildLlmsTxt, detectPageType, recommendTags } from "./tags/recommend.js";
 import { buildRoadmap, estimateTimeline, LINK_PACE, type LinkPace } from "./timeline/estimate.js";
+import { runVisibility, starterPrompts, summarise, type VisibilitySnapshot } from "./visibility/track.js";
+import type { AiEngine } from "./providers/types.js";
 import { hostOf } from "./util/http.js";
 import { tokens } from "./util/text.js";
 
@@ -313,6 +315,44 @@ program
     console.log(`Voice ${lint.score}/100 · AEO ${aeo.aeoScore} · GEO ${aeo.geoScore} · ${todos} [NEEDS DATA] left for a person`);
     if (passesBar(lint, aeo)) console.log("PASS — ready for human review.");
     else console.log(`NEEDS REVISION (voice ≥ ${QUALITY_BAR.voice}, AEO ≥ ${QUALITY_BAR.aeo}):\n${revisionNotes(lint, aeo).join("\n")}`);
+  });
+
+program
+  .command("visibility")
+  .argument("<project>")
+  .description("AI visibility: does ChatGPT / Perplexity / Gemini / Claude mention or cite this brand for buyer questions?")
+  .option("--init", "create visibility-prompts.txt (one question per line) to review before the first run")
+  .option("--engines <list>", "chat_gpt,perplexity,gemini,claude", "chat_gpt,perplexity,gemini,claude")
+  .option("--max-calls <n>", "safety cap on paid AI calls per run", "60")
+  .option("--dry-run", "show what would run and how many paid calls, without calling anything")
+  .option("--demo <fixture>", "use a fixture JSON instead of DataForSEO")
+  .action(async (slug: string, o) => {
+    const p = loadProject(slug);
+    const promptsFile = path.join(projectDir(slug), "visibility-prompts.txt");
+    if (o.init || !fs.existsSync(promptsFile)) {
+      const mined = readJson<{ questions: MinedQuestion[] }>(slug, "questions.json")?.questions.map((q) => q.question) ?? [];
+      const prompts = starterPrompts(p, mined);
+      done(writeText(slug, "visibility-prompts.txt", ["# One question per line. These are asked to each AI engine. Keep the list stable so trends are comparable.", ...prompts].join("\n") + "\n"));
+      console.log(`${prompts.length} starter questions written. Review/edit them, then run: npm run seo -- visibility ${slug}`);
+      return;
+    }
+    const prompts = fs.readFileSync(promptsFile, "utf8").split("\n").map((l) => l.trim()).filter((l) => l && !l.startsWith("#"));
+    const valid: AiEngine[] = ["chat_gpt", "perplexity", "gemini", "claude"];
+    const engines = o.engines.split(",").map((e: string) => e.trim()).filter(Boolean) as AiEngine[];
+    const bad = engines.filter((e) => !valid.includes(e));
+    if (bad.length) throw new Error(`Unknown engine(s): ${bad.join(", ")}. Use: ${valid.join(", ")}`);
+    const calls = prompts.length * engines.length;
+    if (o.dryRun) {
+      console.log(`Would ask ${prompts.length} questions × ${engines.length} engines = ${calls} paid DataForSEO AI calls (cap ${o.maxCalls}). Brand aliases: ${[p.business?.name, p.domain, ...(p.business?.aliases ?? [])].filter(Boolean).join(", ")}. Competitors: ${(p.competitors ?? []).join(", ") || "none — add them to project.json"}.`);
+      return;
+    }
+    const prevFiles = fs.existsSync(path.join(projectDir(slug), "visibility")) ? fs.readdirSync(path.join(projectDir(slug), "visibility")).filter((f) => f.endsWith(".json")).sort() : [];
+    const snap = await runVisibility(p, provider(o.demo), { prompts, engines, maxCalls: Number(o.maxCalls), countryIso: p.market === "uk" ? "GB" : p.market.toUpperCase(), onStep: (s) => log(`  ${s}`) });
+    const sum = summarise(snap);
+    const prevSnap = prevFiles.length ? readJson<VisibilitySnapshot>(slug, path.join("visibility", prevFiles.at(-1)!)) : null;
+    done(writeJson(slug, path.join("visibility", `${snap.takenAt.slice(0, 19).replace(/:/g, "-")}.json`), snap));
+    done(writeText(slug, "visibility.md", visibilityMarkdown(snap, sum, prevSnap ? summarise(prevSnap) : null)));
+    console.log(`Mentioned in ${sum.overall.mentionRate}% of answers, cited in ${sum.overall.citationRate}%, share of voice ${sum.overall.shareOfVoice}%. ${sum.gaps.length} gaps. Cost $${snap.spentUsd}.`);
   });
 
 program

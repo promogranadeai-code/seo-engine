@@ -36,7 +36,8 @@ never show them to a client as real.
 | 5 | `seo timeline <slug> [--keywords "a,b"] [--goal top3] [--pace growth]` | `timeline.md` | free |
 | 6 | `seo offpage <slug>` | `offpage.md` — AI tasks vs human tasks, prospects | DataForSEO |
 | 7 | `seo questions <slug> [--add "Q1?\|Q2?"]` | `questions.md` — AEO/GEO questions | free |
-| 8 | `seo report <slug>` | `report.md` — one-page client summary | free |
+| 8 | `seo visibility <slug> --init`, then `seo visibility <slug>` | `visibility.md` + dated snapshots — mentioned / cited / share of voice per AI engine, gaps, most-cited domains | DataForSEO AI calls (prompts × engines; `--dry-run` first) |
+| 9 | `seo report <slug>` | `report.md` — one-page client summary | free |
 
 Markets: us, uk, in, ae, au, ca, sg (`src/config.ts`). Slug = domain with dots → dashes.
 
@@ -49,6 +50,16 @@ Markets: us, uk, in, ae, au, ca, sg (`src/config.ts`). Slug = domain with dots �
   grades it — see `seo-write`). The key only enables unattended `--via api` runs. Never wire a
   Claude plan login into the CLI; plan logins are for Claude's own apps.
 - Free with no keys: `add`, `audit`, `tags`, `lint`, `check`, `interview`, `offpage --offline`.
+
+## AI visibility (GEO/AEO measurement)
+
+- Asks ChatGPT, Perplexity, Gemini and Claude (via DataForSEO `ai_optimization`, web search on) the
+  questions in `visibility-prompts.txt`; records *mentioned*, *cited* (our domain in the sources),
+  *mention rank*, competitors named, and every cited domain. Snapshots in `visibility/`, trend vs last run.
+- Add competitors to `project.json` (`competitors`) and other spellings to `business.aliases`, or
+  share of voice is meaningless. Keep the prompt list stable month to month. `--max-calls` caps spend.
+- Gaps (competitor named, we're not) → `seo write` topics. Most-cited domains → `seo offpage` targets.
+- Example prompt list: `examples/visibility-prompts.promogranade.txt`.
 
 ## Reading the numbers (explain these to clients)
 

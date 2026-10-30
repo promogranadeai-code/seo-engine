@@ -165,6 +165,27 @@ formula (A).
   scaled, ranking-first content is spam (A). Hence the interview-first writer and
   the human edit step.
 
+## AI visibility tracking
+
+- **Data:** DataForSEO `ai_optimization/{chat_gpt|claude|gemini|perplexity}/llm_responses/live`
+  with `web_search: true` (`force_web_search` for Claude only; no search country for Gemini).
+  Request fields and model choice follow OpenSEO's client, which was live-verified in Aug–Oct 2026.
+  The model is checked against the free `llm_responses/models` catalog first, because DataForSEO
+  bills calls that fail on an invalid model name.
+- **Per answer:**
+  - *Mentioned:* a brand alias appears as a whole word.
+  - *Cited:* our domain is among the annotation URLs.
+  - *Mention rank:* our position among all tracked brands named.
+  - We also record competitors named and every cited domain.
+- **Per run:**
+  - Mention rate and citation rate, per engine and overall.
+  - *Share of voice:* our mentions ÷ all tracked-brand mentions.
+  - *Gaps:* a competitor was named and we weren't.
+  - The most-cited domains.
+- **Caveat:** answers vary by user, location and session (the Ahrefs and Seer studies in §Traffic
+  measured AI Overviews; consumer chat answers vary too). Use the same prompts on a fixed cadence
+  and read the trends.
+
 ## Not done (yet)
 
 - Our own web-scale backlink index. That needs a crawler fleet; we rent DataForSEO's.

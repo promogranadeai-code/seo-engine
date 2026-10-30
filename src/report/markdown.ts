@@ -6,6 +6,7 @@ import type { RoadmapMonth, TimelineEstimate } from "../timeline/estimate.js";
 import type { MinedQuestion } from "../content/questions.js";
 import type { LintResult } from "../content/lint.js";
 import type { AeoResult } from "../content/aeo.js";
+import { ENGINE_LABEL, type VisibilitySnapshot, type VisibilitySummary } from "../visibility/track.js";
 
 const esc = (s: string | number | null | undefined) => String(s ?? "—").replace(/\|/g, "\\|");
 const table = (head: string[], rows: (string | number | null | undefined)[][]) =>
@@ -157,4 +158,49 @@ export function lintMarkdown(file: string, lint: LintResult, aeo: AeoResult): st
     ...(lint.findings.length ? lint.findings.map((f) => `- **${f.severity}** ${f.message}${f.examples.length ? ` — ${f.examples.slice(0, 8).join(", ")}` : ""}`) : ["- Nothing flagged."]),
     ...aeo.advice.map((a) => `- **aeo/geo** ${a}`),
   ].join("\n");
+}
+
+export function visibilityMarkdown(snap: VisibilitySnapshot, sum: VisibilitySummary, prev: VisibilitySummary | null): string {
+  const demo = snap.provider.includes("DEMO") ? "\n> ⚠️ **DEMO DATA** — canned answers from a fixture file, not live AI engines.\n" : "";
+  const delta = (now: number, before: number | undefined) => (before === undefined ? "" : now === before ? " (=)" : ` (${now > before ? "+" : ""}${now - before})`);
+  const errors = snap.results.filter((r) => r.error);
+  const out = [
+    `# AI visibility — ${snap.brand}`,
+    demo,
+    `${snap.takenAt.slice(0, 10)} · ${snap.prompts.length} questions × ${snap.engines.length} AI engines · data cost $${snap.spentUsd}`,
+    "",
+    "**How to read this:** *Mentioned* = the AI named you in its answer. *Cited* = it linked your website as a source. *Share of voice* = your mentions ÷ all brand mentions (you + tracked competitors). AI answers vary per user and day — watch the trend, not one number.",
+    "",
+    table(
+      ["Engine", "Answers", "Mentioned", "Cited", "Share of voice"],
+      [
+        ...sum.byEngine.map((e) => {
+          const p = prev?.byEngine.find((x) => x.engine === e.engine);
+          return [ENGINE_LABEL[e.engine], e.answers, `${e.mentionRate}%${delta(e.mentionRate, p?.mentionRate)}`, `${e.citationRate}%${delta(e.citationRate, p?.citationRate)}`, `${e.shareOfVoice}%${delta(e.shareOfVoice, p?.shareOfVoice)}`];
+        }),
+        ["**All**", snap.results.length - errors.length, `**${sum.overall.mentionRate}%**${delta(sum.overall.mentionRate, prev?.overall.mentionRate)}`, `**${sum.overall.citationRate}%**${delta(sum.overall.citationRate, prev?.overall.citationRate)}`, `**${sum.overall.shareOfVoice}%**${delta(sum.overall.shareOfVoice, prev?.overall.shareOfVoice)}`],
+      ],
+    ),
+    "",
+    "## Where competitors show up and you don't (fix these first)",
+    "",
+    sum.gaps.length ? table(["Question", "Engine", "Competitors named"], sum.gaps.slice(0, 30).map((g) => [g.prompt, ENGINE_LABEL[g.engine], g.competitors.join(", ")])) : "_None this run._",
+    "",
+    "## Sites the AI engines cite most (get mentioned on these)",
+    "",
+    sum.topCitedDomains.length ? table(["Domain", "Times cited"], sum.topCitedDomains.map((d) => [d.domain, d.citations])) : "_No citations returned._",
+    "",
+    "## Where you were mentioned",
+    "",
+    sum.wins.length ? table(["Question", "Engine", "Your site cited?"], sum.wins.map((w) => [w.prompt, ENGINE_LABEL[w.engine], w.cited ? "yes" : "no"])) : "_Not mentioned in any answer yet._",
+    "",
+    "## What to do next",
+    "",
+    "- For each gap: publish or improve a page that answers that exact question directly (answer first, real numbers, named author) — `seo write`.",
+    "- Get listed or quoted on the most-cited domains above (directories, review sites, publications) — they feed AI answers. Add them to `seo offpage`.",
+    "- Keep `llms.txt`, the About page and service pages factual and consistent — AI engines repeat what they find.",
+    "- Re-run monthly with the same questions to see the trend.",
+  ];
+  if (errors.length) out.push("", `## Errors (${errors.length})`, "", ...errors.slice(0, 10).map((e) => `- ${ENGINE_LABEL[e.engine]} — ${e.prompt}: ${e.error}`));
+  return out.join("\n");
 }

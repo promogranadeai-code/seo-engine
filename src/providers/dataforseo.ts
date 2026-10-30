@@ -1,5 +1,7 @@
 import { dataForSeoAuth } from "../config.js";
 import type {
+  AiAnswer,
+  AiEngine,
   Competitor,
   DomainOverview,
   Intent,
@@ -26,6 +28,13 @@ interface Task {
 
 type Item = Record<string, any>;
 
+const AI_MODEL_PREFERENCES: Record<AiEngine, string[]> = {
+  chat_gpt: ["gpt-5.6-luna", "gpt-5.5", "gpt-5.4", "gpt-5"],
+  claude: ["claude-sonnet-5", "claude-sonnet-4-6", "claude-sonnet-4-5"],
+  gemini: ["gemini-2.5-pro"],
+  perplexity: ["sonar-pro", "sonar-reasoning-pro", "sonar"],
+};
+
 /** Platforms that rank for everything — never useful as "competitors". */
 const BIG_PLATFORMS = /(^|\.)(wikipedia\.org|youtube\.com|reddit\.com|quora\.com|linkedin\.com|facebook\.com|instagram\.com|amazon\.[a-z.]+|medium\.com|pinterest\.com|x\.com|twitter\.com|google\.com|forbes\.com)$/;
 
@@ -38,6 +47,14 @@ export class DataForSeoProvider implements SeoDataProvider {
 
   spentUsd() {
     return Math.round(this.spent * 10000) / 10000;
+  }
+
+  private async get(path: string): Promise<Task> {
+    const res = await fetch(API + path, { headers: { authorization: `Basic ${this.auth}` }, signal: AbortSignal.timeout(30_000) });
+    const json = (await res.json().catch(() => ({}))) as { tasks?: Task[]; status_message?: string };
+    const task = json.tasks?.[0];
+    if (!res.ok || !task) throw new Error(`DataForSEO ${path}: HTTP ${res.status} ${json.status_message ?? ""}`.trim());
+    return task;
   }
 
   private async post(path: string, body: unknown[]): Promise<Task> {
@@ -192,6 +209,52 @@ export class DataForSeoProvider implements SeoDataProvider {
       .filter((it) => it.domain && it.domain !== domain && !BIG_PLATFORMS.test(String(it.domain)))
       .slice(0, limit)
       .map((it) => ({ domain: String(it.domain), sharedKeywords: it.intersections ?? 0, avgPosition: it.avg_position ?? null }));
+  }
+
+  private modelCache = new Map<AiEngine, string>();
+
+  /**
+   * Pick a model the engine's catalog actually lists (catalog lookup is free;
+   * DataForSEO bills tasks that fail with an invalid model_name). Preferences
+   * follow OpenSEO's live-verified pins (2026-08/10).
+   */
+  private async modelFor(engine: AiEngine): Promise<string> {
+    const cached = this.modelCache.get(engine);
+    if (cached) return cached;
+    const preferred = AI_MODEL_PREFERENCES[engine];
+    let model = preferred[0]!;
+    try {
+      const task = await this.get(`/v3/ai_optimization/${engine}/llm_responses/models`);
+      const names = new Set(((task.result ?? []) as Item[]).map((r) => String(r.model_name ?? "")));
+      model = preferred.find((m) => names.has(m)) ?? [...names][0] ?? model;
+    } catch {
+      /* catalog unavailable — use the first preference */
+    }
+    this.modelCache.set(engine, model);
+    return model;
+  }
+
+  async aiAnswer(engine: AiEngine, prompt: string, opts: { countryIso?: string } = {}): Promise<AiAnswer> {
+    const model = await this.modelFor(engine);
+    // web_search is permission, not an instruction; only Claude accepts force_web_search,
+    // and Gemini rejects a search country (OpenSEO, verified 2026-08/09).
+    const task = await this.post(`/v3/ai_optimization/${engine}/llm_responses/live`, [
+      {
+        user_prompt: prompt,
+        model_name: model,
+        web_search: true,
+        ...(engine === "claude" ? { force_web_search: true } : {}),
+        max_output_tokens: 1024,
+        ...(opts.countryIso && engine !== "gemini" ? { web_search_country_iso_code: opts.countryIso } : {}),
+      },
+    ]);
+    const result = (task.result?.[0] ?? {}) as Item;
+    const sections: Item[] = ((result.items ?? []) as Item[]).flatMap((it) => (it.sections ?? []) as Item[]);
+    const citations = sections
+      .flatMap((sec) => (sec.annotations ?? []) as Item[])
+      .filter((a) => typeof a.url === "string")
+      .map((a) => ({ url: String(a.url), title: (a.title as string | null) ?? null }));
+    return { engine, model: String(result.model_name ?? model), prompt, text: sections.map((sec) => sec.text ?? "").join("\n"), citations };
   }
 
   // UNVERIFIED against live docs — callers fall back to SERP backlinks_info / provider KD on failure.
