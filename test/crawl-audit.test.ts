@@ -21,7 +21,7 @@ const SITE: Record<string, { status?: number; type?: string; body: string; locat
   "/": {
     body: page(
       "Acme — Web Studio",
-      `<h1>Solutions<br/>that scale</h1><a href="/services/web">Web</a><a href="/old">Old</a><a href="/broken">Broken</a><img src="/a.png"><p>${words(400)}</p>`,
+      `<h1>Solutions<br/>that scale</h1><a href="/services/web">Web</a><a href="/old">Old</a><a href="/broken">Broken</a><a href="/contact">Contact</a><a href="/contact?service=web">Contact about web</a><img src="/a.png"><p>${words(400)}</p>`,
       `<meta name="description" content="Short."><link rel="canonical" href="{ORIGIN}/"><script type="application/ld+json">{"@type":"Organization","name":"Acme"}</script>`,
     ),
   },
@@ -37,6 +37,9 @@ const SITE: Record<string, { status?: number; type?: string; body: string; locat
   "/old": { status: 301, body: "", location: "/older" },
   "/older": { status: 301, body: "", location: "/services/web" },
   "/private": { body: page("Private", "<h1>Private</h1>") },
+  // Two URLs, one canonical: the variant must not count as a duplicate of the page it points to.
+  "/contact": { body: page("Contact Acme today", `<h1>Contact</h1><p>${words(200)}</p>`, `<link rel="canonical" href="{ORIGIN}/contact">`) },
+  "/contact?service=web": { body: page("Contact Acme today", `<h1>Contact</h1><p>${words(200)}</p>`, `<link rel="canonical" href="{ORIGIN}/contact">`) },
 };
 
 let server: http.Server;
@@ -103,6 +106,9 @@ describe("crawl + audit (local test site)", () => {
       "llms-missing", "canonical-missing", "thin-content", "not-https",
     ]) expect(ids, id).toContain(id);
     expect(ids).not.toContain("sitemap-missing");
+    // /contact?service=web canonicalises to /contact, and /old redirects to /services/web: neither is a duplicate.
+    expect(crawl.pages.some((p) => p.url.endsWith("/contact?service=web"))).toBe(true);
+    expect(ids).not.toContain("title-duplicate");
     expect(a.healthScore).toBeLessThan(100);
     expect(a.issues[0]!.severity).toBe("error");
   });

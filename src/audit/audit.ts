@@ -159,10 +159,13 @@ export function auditCrawl(crawl: CrawlResult): AuditResult {
     if (p.finalUrl.startsWith("https:") && p.images.some((i) => i.src.startsWith("http:"))) add("mixed-content", p.url);
   }
 
-  // Duplicates
+  // Duplicates. A page whose canonical points elsewhere (e.g. /contact?service=x → /contact) is already
+  // consolidated by Google, so only self-canonical pages can compete with each other.
+  // A redirected URL is the page it lands on, so it is not counted twice either.
+  const selfCanonical = html.filter((p) => sameUrl(p.url, p.finalUrl) && (!p.canonical || sameUrl(toFetched(p.canonical)!, p.finalUrl)));
   const byTitle = new Map<string, string[]>();
   const byDesc = new Map<string, string[]>();
-  for (const p of html) {
+  for (const p of selfCanonical) {
     if (p.title) byTitle.set(p.title.trim().toLowerCase(), [...(byTitle.get(p.title.trim().toLowerCase()) ?? []), p.url]);
     if (p.metaDescription) byDesc.set(p.metaDescription.trim().toLowerCase(), [...(byDesc.get(p.metaDescription.trim().toLowerCase()) ?? []), p.url]);
   }
@@ -170,7 +173,7 @@ export function auditCrawl(crawl: CrawlResult): AuditResult {
   for (const urls of byDesc.values()) if (urls.length > 1) urls.forEach((u) => add("meta-description-duplicate", u));
 
   // Near-duplicate content (shingle Jaccard ≥ 0.8), skipping very short pages.
-  const sh = html.filter((p) => p.wordCount >= 150).map((p) => ({ url: p.url, s: shingles(p.text) }));
+  const sh = selfCanonical.filter((p) => p.wordCount >= 150).map((p) => ({ url: p.url, s: shingles(p.text) }));
   for (let i = 0; i < sh.length; i++)
     for (let j = i + 1; j < sh.length; j++)
       if (jaccard(sh[i]!.s, sh[j]!.s) >= 0.8) {
